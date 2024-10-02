@@ -42,25 +42,10 @@ AMSI is used by modern Windows systems to detect and block potentially malicious
 1. Run the script. If the script is not running with elevated privileges, it will prompt for admin rights using UAC.
 2. The script will attempt to disable PowerShell logging for increased stealth.
 3. If successful, it will patch the AMSI module similarly to Version 1 but with improved handling and privilege elevation.
-
-## Requirements
-- **Windows OS**: Both scripts are designed for Windows systems.
-- **Python**: Install Python 3.x to execute the scripts.
-- **psutil**: Ensure the `psutil` library is installed by running `pip install psutil`.
-
+4. 
 ### Note:
 The use of these scripts is intended for educational purposes and security research. Misuse in environments without proper authorization may violate laws or regulations.
 
-## Installation
-1. Clone the repository:
-    ```bash
-    git clone https://github.com/your-repo/amsi-patch-scripts.git
-    ```
-2. Install the required libraries:
-    ```bash
-    pip install -r requirements.txt
-    ```
----
 
 # Credits
 
