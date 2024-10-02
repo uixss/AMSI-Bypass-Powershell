@@ -28,7 +28,6 @@ Both versions aim to identify PowerShell processes running on the system and pat
 | **Disable PowerShell Logging**         | No                                                           | Yes, disables `ScriptBlockLogging` in Windows registry using PowerShell commands |
 | **Process Iteration**                  | Iterates over processes to find PowerShell instances and applies AMSI patch | Same as V1                                                    |
 | **Memory Patching**                    | Patches memory by searching for specific byte patterns        | Same as V1                                                    |
-| **Error Handling**                     | Basic error handling for memory operations                   | More extensive error handling                                |
 
 ## How to Use
 
