@@ -1,17 +1,16 @@
 # AMSI Bypass
 
-Este proyecto contiene dos scripts en Python diseñados para detectar y parchear el proceso de PowerShell que tiene cargada la biblioteca `amsi.dll`. El primer script se encarga de monitorear los procesos en ejecución, y el segundo aplica el parche a `amsi.dll` cuando es detectada.
+This project contains two Python scripts designed to detect and patch the PowerShell process that has the library loaded amsi.dll. The first script is responsible for monitoring the processes in execution, and the second applies the patch to amsi.dllwhen she's spotted.
 
+Monitor processes in the system and check if amsi.dllis loaded in the process powershell.exe. If it is detected that amsi.dllIt's loaded, call the second script (patcher.py) to apply the patch.
+Main functions:
 
-Monitorea los procesos en el sistema y verifica si `amsi.dll` está cargado en el proceso `powershell.exe`. Si se detecta que `amsi.dll` está cargado, llama al segundo script (`patcher.py`) para aplicar el parche.
+    is'amsi.loaded(proc): Check if amsi.dllHe's loaded into the given process.
+    main(): Continuously monitor processes and apply the patch when needed.
+    get.module-base-address(pid, module-name): You get the module base address specified in the given process.
+    SPatt(startaddr, pattern): Look for a specific pattern in process memory.
+    PatchProcess(pid): Applies the patch to the corresponding memory address.
 
-#### Funciones principales:
-
-- **is_amsi_loaded(proc)**: Verifica si `amsi.dll` está cargado en el proceso dado.
-- **main()**: Monitorea continuamente los procesos y aplica el parche cuando es necesario.
-- **get_module_base_address(pid, module_name)**: Obtiene la dirección base del módulo especificado en el proceso dado.
-- **SPatt(startaddr, pattern)**: Busca un patrón específico en la memoria del proceso.
-- **PatchProcess(pid)**: Aplica el parche a la dirección de memoria correspondiente.
 
 ---
 
