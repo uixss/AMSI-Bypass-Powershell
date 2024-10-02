@@ -2,7 +2,7 @@
 
 ## How It Works
 
-Both versions aim to identify PowerShell processes running on the system and patch the `amsi.dll` module in memory, bypassing AMSI’s functionality. 
+Identify PowerShell processes running on the system and patch the `amsi.dll` module in memory, bypassing AMSI’s functionality. 
 
 AMSI is used by modern Windows systems to detect and block potentially malicious scripts, so disabling or modifying it is useful in security research or penetration testing environments.
 
@@ -42,7 +42,7 @@ AMSI is used by modern Windows systems to detect and block potentially malicious
 1. Run the script. If the script is not running with elevated privileges, it will prompt for admin rights using UAC.
 2. The script will attempt to disable PowerShell logging for increased stealth.
 3. If successful, it will patch the AMSI module similarly to Version 1 but with improved handling and privilege elevation.
-4. 
+
 ### Note:
 The use of these scripts is intended for educational purposes and security research. Misuse in environments without proper authorization may violate laws or regulations.
 
@@ -50,8 +50,6 @@ The use of these scripts is intended for educational purposes and security resea
 # Credits
 
 https://github.com/bytepulze/amsi-bypass
-
-- for example :
 
  | 48:85D2 | test rdx, rdx |
 
