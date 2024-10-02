@@ -1,4 +1,4 @@
-# AMSI-Patch-Powershell
+# AMSI Bypass Powershell
 
 - Process Scanning: Continuously monitors running PowerShell processes.
 - AMSI Detection: Detects if amsi.dll is loaded in a process.
