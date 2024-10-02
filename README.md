@@ -49,7 +49,8 @@ The use of these scripts is intended for educational purposes and security resea
 
 # Credits
 
-https://github.com/bytepulze/amsi-bypass
+[https://github.com/bytepulze/amsi-bypass
+](https://github.com/ZeroMemoryEx)
 
  | 48:85D2 | test rdx, rdx |
 
