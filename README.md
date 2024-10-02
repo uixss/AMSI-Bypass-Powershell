@@ -63,6 +63,7 @@ The use of these scripts is intended for educational purposes and security resea
 # Credits
 
 https://github.com/ZeroMemoryEx
+
 https://github.com/S1lkys/SharpKiller
 
  | 48:85D2 | test rdx, rdx |
