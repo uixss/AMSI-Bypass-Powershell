@@ -1,10 +1,24 @@
 # AMSI Bypass
 
-## How It Works
+Este proyecto contiene dos scripts en Python diseñados para detectar y parchear el proceso de PowerShell que tiene cargada la biblioteca `amsi.dll`. El primer script se encarga de monitorear los procesos en ejecución, y el segundo aplica el parche a `amsi.dll` cuando es detectada.
 
-Identify PowerShell processes running on the system and patch the `amsi.dll` module in memory, bypassing AMSI’s functionality. 
 
-AMSI is used by modern Windows systems to detect and block potentially malicious scripts, so disabling or modifying it is useful in security research or penetration testing environments.
+Monitorea los procesos en el sistema y verifica si `amsi.dll` está cargado en el proceso `powershell.exe`. Si se detecta que `amsi.dll` está cargado, llama al segundo script (`patcher.py`) para aplicar el parche.
+
+#### Funciones principales:
+
+- **is_amsi_loaded(proc)**: Verifica si `amsi.dll` está cargado en el proceso dado.
+- **main()**: Monitorea continuamente los procesos y aplica el parche cuando es necesario.
+- **get_module_base_address(pid, module_name)**: Obtiene la dirección base del módulo especificado en el proceso dado.
+- **SPatt(startaddr, pattern)**: Busca un patrón específico en la memoria del proceso.
+- **PatchProcess(pid)**: Aplica el parche a la dirección de memoria correspondiente.
+
+---
+
+# BYPASS-FOLDER
+
+---
+
 
 ### Version 1
 
@@ -50,6 +64,7 @@ The use of these scripts is intended for educational purposes and security resea
 # Credits
 
 https://github.com/ZeroMemoryEx
+https://github.com/S1lkys/SharpKiller
 
  | 48:85D2 | test rdx, rdx |
 
