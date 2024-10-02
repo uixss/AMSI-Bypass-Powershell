@@ -3,6 +3,7 @@ import time
 import psutil
 from ctypes import wintypes
 
+
 const = {
     "vmoperation": 0x0008,
     "vmread": 0x0010,
