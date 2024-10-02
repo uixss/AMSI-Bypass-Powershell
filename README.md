@@ -1,4 +1,4 @@
-# AMSI Bypass Powershell
+# AMSI Bypass
 
 ## How It Works
 
