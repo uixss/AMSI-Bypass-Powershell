@@ -5,12 +5,6 @@
 - Patch Application: Automatically patches the AMSI interface to bypass antivirus checks.
 - Cross-Process Memory Manipulation: Reads and writes memory to patch the AMSI functionality in the target process.
 
-Requirements
-
-    Python 3.6+
-    ctypes for interacting with the Windows API
-    psutil for process management
-
 # Usage
 
 Run the script with administrator privileges for it to function correctly. It continuously monitors PowerShell processes and applies the patch if necessary.
