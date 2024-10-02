@@ -2,7 +2,9 @@
 
 ## How It Works
 
-Both versions aim to identify PowerShell processes running on the system and patch the `amsi.dll` module in memory, bypassing AMSI’s functionality. AMSI is used by modern Windows systems to detect and block potentially malicious scripts, so disabling or modifying it is useful in security research or penetration testing environments.
+Both versions aim to identify PowerShell processes running on the system and patch the `amsi.dll` module in memory, bypassing AMSI’s functionality. 
+
+AMSI is used by modern Windows systems to detect and block potentially malicious scripts, so disabling or modifying it is useful in security research or penetration testing environments.
 
 ### Version 1
 
