@@ -1,8 +1,6 @@
 # AMSI Bypass
 
-This project contains two Python scripts designed to detect and patch the PowerShell process that has the library loaded amsi.dll. The first script is responsible for monitoring the processes in execution, and the second applies the patch to amsi.dllwhen she's spotted.
-
-Monitor processes in the system and check if amsi.dllis loaded in the process powershell.exe. If it is detected that amsi.dllIt's loaded, call the second script (patcher.py) to apply the patch.
+Monitor processes in the system and check if amsi.dllis loaded in the process powershell.exe. If it is detected that amsi.dllIt's loaded, call the second script (amsi.py) to apply the patch.
 Main functions:
 
     is'amsi.loaded(proc): Check if amsi.dllHe's loaded into the given process.
